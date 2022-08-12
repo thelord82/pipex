@@ -5,42 +5,101 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: malord <malord@student.42quebec.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/07/07 09:46:10 by malord            #+#    #+#             */
-/*   Updated: 2022/08/02 10:15:55 by malord           ###   ########.fr       */
+/*   Created: 2022/08/03 08:57:51 by malord            #+#    #+#             */
+/*   Updated: 2022/08/04 09:36:33 by malord           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	main(void)
+void	ft_execute_cmd(char **envp, char *arg)
 {
-	int		pipefds[2];
-	char	*pin;
-	char	*buffer;
-	pid_t	pid;
+	char	*cmd_path;
+	char	**cmd;
+	int		i;
 
-	if (pipe(pipefds) == -1)
+	i = -1;
+	cmd = ft_split(arg, ' ');
+	cmd_path = ft_retrieve_paths_n_cmd(envp, cmd[0]);
+	if (!cmd_path)
 	{
-		perror("pipe");
-		exit(0);
+		write(2, "command not found: ", 20);
+		while (cmd[++i])
+		{
+			write(2, cmd[i], ft_strlen(cmd[i]));
+			write(2, " ", 1);
+			free(cmd[i]);
+		}
+		free(cmd);
+		write(2, "\n", 1);
+		exit (1);
 	}
-	pid = fork();
-	if (pid == 0) // child process = 0, parent process > 0
+	if (execve(cmd_path, cmd, envp) == -1)
 	{
-		pin = "69696969";
-		close (pipefds[0]);
-		write (pipefds[1], pin, ft_strlen(pin));
-		printf("Generating PIN in child and sending to parent ...\n");
-		exit(0);
+		write(2, "Error, can't execute command\n", 30);
+		exit (1);
 	}
-	buffer = ft_calloc(sizeof(char), 8);
-	if (pid > 0) // parent process! 
+}
+
+void	ft_child(int *fd, char **envp, char *file, char **av)
+{
+	int		fd_file;
+
+	fd_file = open(file, O_RDONLY, 0777);
+	if (fd_file == -1)
 	{
-		waitpid(pid, NULL, 0);
-		close (pipefds[1]);
-		read(pipefds[0], buffer, 8);
-		close (pipefds[0]);
-		printf("Parent received pin '%s'\n", buffer);
+		printf("%s: %s\n", strerror(2), file);
+		exit (1);
 	}
+	dup2(fd[1], 1);
+	dup2(fd_file, 0);
+	close(fd[0]);
+	ft_check_cmd(av[2]);
+	ft_execute_cmd(envp, av[2]);
+	close(fd_file);
+}
+
+void	ft_parent(int *fd, char **envp, char *file, char **av)
+{
+	int		fd_file;
+
+	fd_file = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (fd_file == -1)
+	{
+		printf("%s: %s\n", strerror(9), file);
+		exit (1);
+	}
+	dup2(fd[0], 0);
+	dup2(fd_file, 1);
+	close(fd[1]);
+	ft_check_cmd(av[3]);
+	ft_execute_cmd(envp, av[3]);
+	close(fd_file);
+}
+
+int	main(int argc, char **argv, char **envp)
+{
+	int	child;
+	int	fd[2];
+
+	if (argc == 5)
+	{
+		if (pipe(fd) == -1)
+		{
+			perror(strerror(32));
+			return (1);
+		}
+		child = fork();
+		if (child == -1)
+		{
+			perror(strerror(10));
+			return (1);
+		}
+		if (child == 0)
+			ft_child(fd, envp, argv[1], argv);
+		ft_parent(fd, envp, argv[4], argv);
+	}
+	else
+		write(2, "Wrong number of arguments\n", 27);
 	return (0);
 }

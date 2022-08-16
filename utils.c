@@ -6,7 +6,7 @@
 /*   By: malord <malord@student.42quebec.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 10:55:58 by malord            #+#    #+#             */
-/*   Updated: 2022/08/15 19:32:38 by malord           ###   ########.fr       */
+/*   Updated: 2022/08/16 10:49:14 by malord           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	free_paths(char **paths, int i)
 	}
 }
 
-char	*get_command_path(char **envp, char *cmd)
+char	*get_paths_command(char **envp, char *cmd)
 {
 	int		i;
 	char	**paths;
@@ -76,8 +76,6 @@ char	*get_command_path(char **envp, char *cmd)
 	{
 		temp = ft_strjoin(paths[i], "/");
 		cmd_path = ft_strjoin_free(temp, cmd);
-		//cmd_path = ft_strjoin(temp, cmd);
-		//free (temp);
 		if (access(cmd_path, F_OK | X_OK) == 0)
 			return (cmd_path);
 		free(cmd_path);

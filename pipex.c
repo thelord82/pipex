@@ -6,7 +6,7 @@
 /*   By: malord <malord@student.42quebec.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 08:57:51 by malord            #+#    #+#             */
-/*   Updated: 2022/08/15 19:17:24 by malord           ###   ########.fr       */
+/*   Updated: 2022/08/16 11:45:45 by malord           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	exec_command(char **envp, char *arg)
 
 	i = -1;
 	cmd = ft_split(arg, ' ');
-	cmd_path = get_command_path(envp, cmd[0]);
+	cmd_path = get_paths_command(envp, cmd[0]);
 	if (!cmd_path)
 	{
 		write(2, "command not found: ", 20);
@@ -34,52 +34,50 @@ void	exec_command(char **envp, char *arg)
 		write(2, "\n", 1);
 		exit (1);
 	}
-	if (execve(cmd_path, cmd, envp) == -1)
-	{
-		write(2, "Error, can't execute command\n", 30);
-		exit (1);
-	}
+	execve(cmd_path, cmd, envp);
+	exit(1);
+
 }
 
-void	do_child(int *fd, char **envp, char *file, char **argv)
+void	do_child(int *fd, char **envp, char *file, char **av)
 {
-	int		fd_file;
+	int		fd2;
 
-	fd_file = open(file, O_RDONLY, 0777);
-	if (fd_file == -1)
+	fd2 = open(file, O_RDONLY, 0777);
+	if (fd2 == -1)
 	{
 		printf("%s: %s\n", strerror(ENOENT), file);
 		exit (1);
 	}
 	dup2(fd[1], 1);
-	dup2(fd_file, 0);
+	dup2(fd2, 0);
 	close(fd[0]);
-	check_command(argv[2]);
-	exec_command(envp, argv[2]);
-	close(fd_file);
+	check_command(av[2]);
+	exec_command(envp, av[2]);
+	close(fd2);
 }
 
-void	do_parent(int *fd, char **envp, char *file, char **argv)
+void	do_parent(int *fd, char **envp, char *file, char **av)
 {
-	int		fd_file;
+	int		fd2;
 
-	fd_file = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	if (fd_file == -1)
+	fd2 = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (fd2 == -1)
 	{
 		printf("%s: %s\n", strerror(EBADF), file);
 		exit (1);
 	}
 	dup2(fd[0], 0);
-	dup2(fd_file, 1);
+	dup2(fd2, 1);
 	close(fd[1]);
-	check_command(argv[3]);
-	exec_command(envp, argv[3]);
-	close(fd_file);
+	check_command(av[3]);
+	exec_command(envp, av[3]);
+	close(fd2);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
-	int	child;
+	int	pid;
 	int	fd[2];
 
 	if (argc == 5)
@@ -89,13 +87,13 @@ int	main(int argc, char **argv, char **envp)
 			perror(strerror(EPIPE));
 			return (1);
 		}
-		child = fork();
-		if (child == -1)
+		pid = fork();
+		if (pid == -1)
 		{
 			perror(strerror(ECHILD));
 			return (1);
 		}
-		if (child == 0)
+		if (pid == 0)
 			do_child(fd, envp, argv[1], argv);
 		do_parent(fd, envp, argv[4], argv);
 	}

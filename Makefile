@@ -6,7 +6,7 @@
 #    By: malord <malord@student.42quebec.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/20 10:07:57 by malord            #+#    #+#              #
-#    Updated: 2022/08/02 08:27:48 by malord           ###   ########.fr        #
+#    Updated: 2022/08/15 18:58:22 by malord           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,8 @@ CC			=	gcc
 CFLAGS		=	-Wall -Werror -Wextra
 RM			=	rm -f
 
-SRCS		=	pipex.c
+SRCS		=	pipex.c	\
+				utils.c
 
 OBJS		= 	${SRCS:.c=.o}
 

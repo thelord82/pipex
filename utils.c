@@ -1,25 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   paths.c                                            :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: malord <malord@student.42quebec.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 10:55:58 by malord            #+#    #+#             */
-/*   Updated: 2022/08/04 10:56:01 by malord           ###   ########.fr       */
+/*   Updated: 2022/08/15 19:32:38 by malord           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	ft_check_cmd(char *cmd)
+void	check_command(char *cmd)
 {
 	int	i;
 
 	i = 0;
 	if (cmd[0] == '\0')
 	{
-		write(2, strerror(13), 17);
+		write(2, strerror(EACCES), 17);
 		write(2, ":\n", 2);
 		exit (1);
 	}
@@ -36,7 +36,7 @@ void	ft_check_cmd(char *cmd)
 	}
 }
 
-int	ft_check_envp(char **envp)
+int	check_envp(char **envp)
 {
 	int	i;
 
@@ -46,35 +46,45 @@ int	ft_check_envp(char **envp)
 		i++;
 		if (envp[i] == NULL)
 		{
-			write(2, "Environnement pas trouvé\n", 27);
+			write(2, "No environment variables found\n", 27);
 			exit(1);
 		}
 	}
 	return (i);
 }
 
-char	*ft_retrieve_paths_n_cmd(char **envp, char *cmd)
+void	free_paths(char **paths, int i)
+{
+	while (paths[i])
+	{
+		free(paths[i]);
+		i++;
+	}
+}
+
+char	*get_command_path(char **envp, char *cmd)
 {
 	int		i;
 	char	**paths;
 	char	*cmd_path;
 	char	*temp;
 
-	i = ft_check_envp(envp);
+	i = check_envp(envp);
 	paths = ft_split(envp[i] + 5, ':');
-	i = -1;
-	while (paths[++i])
+	i = 0;
+	while (paths[i])
 	{
 		temp = ft_strjoin(paths[i], "/");
-		cmd_path = ft_strjoin(temp, cmd);
-		free (temp);
+		cmd_path = ft_strjoin_free(temp, cmd);
+		//cmd_path = ft_strjoin(temp, cmd);
+		//free (temp);
 		if (access(cmd_path, F_OK | X_OK) == 0)
 			return (cmd_path);
 		free(cmd_path);
+		i++;
 	}
-	i = -1;
-	while (paths[++i])
-		free(paths[i]);
+	i = 0;
+	free_paths(paths, i);
 	free(paths);
-	return (0);
+	return (NULL);
 }

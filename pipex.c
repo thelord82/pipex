@@ -6,7 +6,7 @@
 /*   By: malord <malord@student.42quebec.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 08:57:51 by malord            #+#    #+#             */
-/*   Updated: 2022/08/16 11:45:45 by malord           ###   ########.fr       */
+/*   Updated: 2022/08/18 15:56:25 by malord           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,13 @@ void	exec_command(char **envp, char *arg)
 	char	**cmd;
 	int		i;
 
-	i = -1;
+	i = 0;
 	cmd = ft_split(arg, ' ');
 	cmd_path = get_paths_command(envp, cmd[0]);
 	if (!cmd_path)
 	{
 		write(2, "command not found: ", 20);
-		while (cmd[++i])
+		while (cmd[i++])
 		{
 			write(2, cmd[i], ft_strlen(cmd[i]));
 			write(2, " ", 1);
@@ -36,10 +36,9 @@ void	exec_command(char **envp, char *arg)
 	}
 	execve(cmd_path, cmd, envp);
 	exit(1);
-
 }
 
-void	do_child(int *fd, char **envp, char *file, char **av)
+void	do_child(int *fd, char **envp, char *file, char **argv)
 {
 	int		fd2;
 
@@ -52,12 +51,12 @@ void	do_child(int *fd, char **envp, char *file, char **av)
 	dup2(fd[1], 1);
 	dup2(fd2, 0);
 	close(fd[0]);
-	check_command(av[2]);
-	exec_command(envp, av[2]);
 	close(fd2);
+	check_command(argv[2]);
+	exec_command(envp, argv[2]);
 }
 
-void	do_parent(int *fd, char **envp, char *file, char **av)
+void	do_parent(int *fd, char **envp, char *file, char **argv)
 {
 	int		fd2;
 
@@ -70,9 +69,9 @@ void	do_parent(int *fd, char **envp, char *file, char **av)
 	dup2(fd[0], 0);
 	dup2(fd2, 1);
 	close(fd[1]);
-	check_command(av[3]);
-	exec_command(envp, av[3]);
 	close(fd2);
+	check_command(argv[3]);
+	exec_command(envp, argv[3]);
 }
 
 int	main(int argc, char **argv, char **envp)

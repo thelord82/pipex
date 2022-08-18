@@ -6,7 +6,7 @@
 #    By: malord <malord@student.42quebec.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/20 10:07:57 by malord            #+#    #+#              #
-#    Updated: 2022/08/15 18:58:22 by malord           ###   ########.fr        #
+#    Updated: 2022/08/17 09:18:21 by malord           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ $(NAME): 		$(OBJS)
 				@$(MAKE) -C libft
 				@echo "libft compiled successfully."
 				@echo "Compiling $(NAME) sources"
-				@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT)	
+				@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT)
 				@echo "Done !"
 
 all: 			$(NAME)

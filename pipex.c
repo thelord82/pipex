@@ -6,7 +6,7 @@
 /*   By: malord <malord@student.42quebec.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 08:57:51 by malord            #+#    #+#             */
-/*   Updated: 2022/08/18 15:56:25 by malord           ###   ########.fr       */
+/*   Updated: 2022/08/19 14:06:12 by malord           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,10 @@ void	exec_command(char **envp, char *arg)
 		}
 		free(cmd);
 		write(2, "\n", 1);
-		exit (1);
+		exit (0);
 	}
 	execve(cmd_path, cmd, envp);
-	exit(1);
+	exit(0);
 }
 
 void	do_child(int *fd, char **envp, char *file, char **argv)
@@ -46,12 +46,13 @@ void	do_child(int *fd, char **envp, char *file, char **argv)
 	if (fd2 == -1)
 	{
 		printf("%s: %s\n", strerror(ENOENT), file);
-		exit (1);
+		exit (0);
 	}
 	dup2(fd[1], 1);
 	dup2(fd2, 0);
 	close(fd[0]);
 	close(fd2);
+	close (fd[1]);
 	check_command(argv[2]);
 	exec_command(envp, argv[2]);
 }
@@ -70,6 +71,7 @@ void	do_parent(int *fd, char **envp, char *file, char **argv)
 	dup2(fd2, 1);
 	close(fd[1]);
 	close(fd2);
+	close (fd[0]);
 	check_command(argv[3]);
 	exec_command(envp, argv[3]);
 }

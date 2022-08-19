@@ -6,7 +6,7 @@
 /*   By: malord <malord@student.42quebec.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 10:55:58 by malord            #+#    #+#             */
-/*   Updated: 2022/08/18 14:25:46 by malord           ###   ########.fr       */
+/*   Updated: 2022/08/19 13:23:45 by malord           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	check_command(char *cmd)
 	{
 		write(2, strerror(EACCES), 17);
 		write(2, ":\n", 2);
-		exit (1);
+		exit (0);
 	}
 	while (cmd[i])
 	{
@@ -31,7 +31,7 @@ void	check_command(char *cmd)
 		if (cmd[i] == '\0')
 		{
 			write(2, "command not found: \n", 20);
-			exit (1);
+			exit (0);
 		}
 	}
 }
@@ -47,7 +47,7 @@ int	check_envp(char **envp)
 		if (envp[i] == NULL)
 		{
 			write(2, "No environment variables found\n", 27);
-			exit(1);
+			exit(0);
 		}
 	}
 	return (i);

@@ -6,7 +6,7 @@
 /*   By: malord <malord@student.42quebec.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 08:57:51 by malord            #+#    #+#             */
-/*   Updated: 2022/08/19 14:06:12 by malord           ###   ########.fr       */
+/*   Updated: 2022/11/06 13:05:52 by malord           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,14 @@ void	exec_command(char **envp, char *arg)
 	if (!cmd_path)
 	{
 		write(2, "command not found: ", 20);
-		while (cmd[i++])
+		while (cmd[i])
 		{
 			write(2, cmd[i], ft_strlen(cmd[i]));
-			write(2, " ", 1);
 			free(cmd[i]);
+			i++;
 		}
 		free(cmd);
+		free(cmd_path);
 		write(2, "\n", 1);
 		exit (0);
 	}

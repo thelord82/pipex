@@ -6,7 +6,7 @@
 /*   By: malord <malord@student.42quebec.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 10:39:45 by malord            #+#    #+#             */
-/*   Updated: 2022/08/16 10:47:37 by malord           ###   ########.fr       */
+/*   Updated: 2022/11/06 12:45:25 by malord           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,4 +21,5 @@
 
 void	check_command(char *cmd);
 char	*get_paths_command(char **envp, char *cmd);
+void	free_paths(char **paths, int i);
 #endif

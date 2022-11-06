@@ -6,7 +6,7 @@
 /*   By: malord <malord@student.42quebec.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 10:55:58 by malord            #+#    #+#             */
-/*   Updated: 2022/08/19 13:23:45 by malord           ###   ########.fr       */
+/*   Updated: 2022/11/06 13:15:00 by malord           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,11 @@ int	check_envp(char **envp)
 
 void	free_paths(char **paths, int i)
 {
-	while (paths[i++])
+	while (paths[i])
+	{
 		free(paths[i]);
+		i++;
+	}
 }
 
 char	*get_paths_command(char **envp, char *cmd)
